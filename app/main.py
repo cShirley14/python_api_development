@@ -1,16 +1,34 @@
-from os import stat
 from typing import Optional
 from fastapi import FastAPI, Response, status, HTTPException
-from fastapi.param_functions import Body
+from psycopg.rows import dict_row
 from pydantic import BaseModel
 from random import randrange
+import psycopg
+import yaml
 
 app = FastAPI()
+
+with open('config.yaml', 'r') as file:
+    raw_yml = yaml.load(file, Loader=yaml.SafeLoader)
+    password = raw_yml["password"]
+    user = raw_yml["user"]
+    host = raw_yml["host"]
+    dbname = raw_yml["dbname"]
+
 class Post(BaseModel):
     title: str
     content: str
     published: bool = True
     rating: Optional[int] = None
+
+# Connect to existing DB
+try:
+    conn = psycopg.connect(host=host , dbname=dbname , user=user, row_factory=dict_row, password=password)  
+    cursor = conn.cursor()
+    print("Database Connection was successful!")
+except Exception as er:
+    print("DB Connection Failure")
+    print("ERROR: ", er)
 
 my_posts = [
     {
