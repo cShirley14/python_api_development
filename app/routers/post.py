@@ -1,7 +1,9 @@
 from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from typing import List
-from .. import models, schemas
+
+from app import oauth2
+from .. import models, schemas, oauth2
 from ..database import get_db
 
 router = APIRouter(
@@ -25,7 +27,8 @@ def get_posts(db: Session = Depends(get_db)):
 #     return {"status": posts}
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
-def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
+def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), 
+                current_user: int = Depends(oauth2.get_current_user)):
     # post_dict = post.dict()
     # post_dict['id'] = randrange(0, 10000000)
     # my_posts.append(post_dict)
@@ -38,7 +41,7 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     #                         published=post.published)
 
     new_post = models.Post(**post.dict())
-
+    print(current_user)
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
@@ -59,7 +62,8 @@ def get_post(id: int, db: Session = Depends(get_db)):
     return post
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db)): 
+def delete_post(id: int, db: Session = Depends(get_db), 
+                current_user: int = Depends(oauth2.get_current_user)): 
     # Deleting post
     # Find the index in the array that has req. ID
     # my_posts.pop(index)
@@ -83,7 +87,8 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     return post
 
 @router.put("/{id}")
-def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db)):
+def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends(get_db),
+                current_user: int = Depends(oauth2.get_current_user)):
     # index = find_index_post(id)
     # cursor.execute(""" UPDATE posts SET title= %s, content = %s, published = %s WHERE id = %sRETURNING * """, 
     #                 (post.title, post.content, post.published, str(id)))

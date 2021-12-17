@@ -11,7 +11,7 @@ class PostBase(BaseModel):
 class PostCreate(PostBase):
     pass
 
-class Post(BaseModel):
+class Post(PostBase):
     id: int
     created_at: datetime
 
@@ -42,4 +42,4 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    id: Optional[str]
+    id: Optional[str] = None
