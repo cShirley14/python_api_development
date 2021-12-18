@@ -19,3 +19,12 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# # Connect to existing DB
+# try:
+#     conn = psycopg.connect(host=host , dbname=dbname , user=user, row_factory=dict_row, password=password)  
+#     cursor = conn.cursor()
+#     print("Database Connection was successful!")
+# except Exception as er:
+#     print("DB Connection Failure")
+#     print("ERROR: ", er)
