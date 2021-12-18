@@ -5,10 +5,9 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm.session import Session
 
 from app import models
+from app.config import Settings
 from . import schemas, database
 from fastapi.security import OAuth2PasswordBearer
-
-import yaml
 
 # SECRET_KEY
 # Algorithm
@@ -16,19 +15,22 @@ import yaml
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
-with open('config.yaml', 'r') as file:
-    raw_yml = yaml.load(file, Loader=yaml.SafeLoader)
-    SECRET_KEY = raw_yml["secretkey"]
-    ALGORITHM = raw_yml["algorithm"]
-    ACCESS_TOKEN_EXPIRE_MINUTES = raw_yml["tokenexpiry"]
+settings = Settings()
+
+# if settings.secret_key == None or settings.algorithm == None or settings.expiry_time == None:
+#     with open('config.yaml', 'r') as file:
+#         raw_yml = yaml.load(file, Loader=yaml.SafeLoader)
+#         SECRET_KEY = raw_yml["secretkey"]
+#         ALGORITHM = raw_yml["algorithm"]
+#         ACCESS_TOKEN_EXPIRE_MINUTES = raw_yml["tokenexpiry"]
 
 def create_access_token(data: dict):
     to_encode = data.copy()
 
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + timedelta(minutes=settings.expiry_time)
     to_encode.update({"exp": expire})
 
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
     return encoded_jwt
 
