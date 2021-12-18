@@ -1,6 +1,7 @@
 from fastapi import Depends, status, HTTPException
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+from jose.constants import ALGORITHMS
 
 from sqlalchemy.orm.session import Session
 
@@ -16,8 +17,10 @@ from fastapi.security import OAuth2PasswordBearer
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
 settings = Settings()
+SECRET_KEY = settings.secret_key
+ALGORITHM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.expiry_time
 
-# if settings.secret_key == None or settings.algorithm == None or settings.expiry_time == None:
 #     with open('config.yaml', 'r') as file:
 #         raw_yml = yaml.load(file, Loader=yaml.SafeLoader)
 #         SECRET_KEY = raw_yml["secretkey"]
@@ -27,10 +30,10 @@ settings = Settings()
 def create_access_token(data: dict):
     to_encode = data.copy()
 
-    expire = datetime.utcnow() + timedelta(minutes=settings.expiry_time)
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
 
-    encoded_jwt = jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
     return encoded_jwt
 
