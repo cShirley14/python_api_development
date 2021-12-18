@@ -12,11 +12,13 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[schemas.Post])
-def get_posts(db: Session = Depends(get_db)):
+def get_posts(db: Session = Depends(get_db),
+            current_user: int = Depends(oauth2.get_current_user),
+            limit: int = 10, skip: int = 0):
     # posts = cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
 
-    posts = db.query(models.Post).all()
+    posts = db.query(models.Post).limit(limit).offset(skip).all()
 
     return posts # FastApi serializes the model into json
 
