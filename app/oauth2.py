@@ -19,7 +19,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 settings = Settings()
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
-ACCESS_TOKEN_EXPIRE_MINUTES = settings.expiry_time
+ACCESS_TOKEN_EXPIRE_MINUTES = int(settings.expiry_time)
 
 #     with open('config.yaml', 'r') as file:
 #         raw_yml = yaml.load(file, Loader=yaml.SafeLoader)
