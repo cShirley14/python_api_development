@@ -40,7 +40,10 @@ class Post(PostBase):
 
     class Config:
         orm_mode = True
- 
+
+# class PostOut(PostBase):
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str
