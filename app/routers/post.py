@@ -18,8 +18,10 @@ router = APIRouter(
 #             current_user: int = Depends(oauth2.get_current_user),
 #             limit: int = 10, skip: int = 0, search: Optional[str] = ""):
 @router.get("/", response_model=List[schemas.PostOut])
-def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user),
+def get_posts(db: Session = Depends(get_db),
+    current_user: int = Depends(oauth2.get_current_user),
     limit: int = 10, skip: int = 0, search: Optional[str] = ""):
+
     # posts = cursor.execute("""SELECT * FROM posts""")
     # posts = cursor.fetchall()
 
@@ -64,19 +66,15 @@ def get_post(id: int, db: Session = Depends(get_db),
     # cursor.execute("""SELECT * FROM posts WHERE id = (%s) """, (id,))
     # post = cursor.fetchone()
     
-    post = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, 
-        models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
+    post_query = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.id == id)
 
+    post = post_query.first()
     
     if not post:
         # response.status_code = status.HTTP_404_NOT_FOUND
         # return {'message ' f"post with id: {id} not found :("}
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with id: {id} not found :(")
-
-    if post.owner_id !=  current_user.id:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=
-                            f"Not authorized to perform request")
 
     return post
 
@@ -95,7 +93,7 @@ def delete_post(id: int, db: Session = Depends(get_db),
 
     post = post_query.first()
 
-    if post == None:
+    if post is None:
         # response.status_code = status.HTTP_404_NOT_FOUND
         # return {'message ' f"post with id: {id} not found :("}
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -124,7 +122,7 @@ def update_post(id: int, updated_post: schemas.PostCreate, db: Session = Depends
 
     post = post_query.first()
 
-    if post == None:
+    if post is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"post with id: {id} does not exist")
 
