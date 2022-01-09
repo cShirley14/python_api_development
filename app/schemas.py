@@ -5,6 +5,8 @@ from datetime import datetime
 
 from pydantic.types import conint
 
+from app.database import Base
+
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
@@ -41,9 +43,13 @@ class Post(PostBase):
     class Config:
         orm_mode = True
 
-# class PostOut(PostBase):
+class PostOut(BaseModel):
+    Post: Post
+    votes: int
 
-
+    class Config:
+        orm_mode = True
+    
 class Token(BaseModel):
     access_token: str
     token_type: str
