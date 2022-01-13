@@ -1,6 +1,6 @@
 Video Marker:
-https://www.youtube.com/watch?v=0sOvCWFmrtA&t=38905
-10:48:25
+https://www.youtube.com/watch?v=0sOvCWFmrtA&t=39672
+11:01:12
 
 Command to get Uvicorn Server up:
     uvicorn main:app --reload
